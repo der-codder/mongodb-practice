@@ -7,6 +7,21 @@ const Artist = require('../models/artist');
  * @param {integer} offset How many records to skip in the result set
  * @param {integer} limit How many records to return in the result set
  * @return {promise} A promise that resolves with the artists, count, offset, and limit
+ * like this: { all: [artists], count: count, offset: offset, limit: limit }
  */
-module.exports = (criteria, sortProperty, offset = 0, limit = 20) => {
+module.exports = (criteria, sortProperty, offset = 0, limit = 6) => {
+  const searchQuery = Artist.find({})
+    .sort({ [sortProperty]: 'asc'})
+    .skip(offset)
+    .limit(limit);
+
+  return Promise.all([searchQuery, Artist.count()])
+    .then((results) => {
+      return {
+        all: results[0],
+        count: results[1],
+        offset: offset,
+        limit: limit
+      };
+    });
 };
