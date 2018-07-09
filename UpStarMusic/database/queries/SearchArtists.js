@@ -10,30 +10,30 @@ const Artist = require('../models/artist');
  *   like this: { all: [artists], count: count, offset: offset, limit: limit }
  */
 module.exports = (criteria, sortProperty, offset = 0, limit = 6) => {
-  const query = {};
+  const searchCriteria = {};
   if (criteria.name) {
-    // query.name = {
+    // searchCriteria.name = {
     //   $regex: criteria.name,
     //   $options: "i"
     // };
 
     // Add text index to make it work:
     //   db.artists.createIndex({ name: "text" })
-    query.$text = { $search: criteria.name };
+    searchCriteria.$text = { $search: criteria.name };
   }
   if (criteria.age) {
-    query.age = { $gte: criteria.age.min, $lte: criteria.age.max };
+    searchCriteria.age = { $gte: criteria.age.min, $lte: criteria.age.max };
   }
   if (criteria.yearsActive) {
-    query.yearsActive = { $gte: criteria.yearsActive.min, $lte: criteria.yearsActive.max };
+    searchCriteria.yearsActive = { $gte: criteria.yearsActive.min, $lte: criteria.yearsActive.max };
   }
 
-  const searchQuery = Artist.find(query)
+  const searchQuery = Artist.find(searchCriteria)
     .sort({ [sortProperty]: 'asc' })
     .skip(offset)
     .limit(limit);
 
-  return Promise.all([searchQuery, Artist.count()])
+  return Promise.all([searchQuery, Artist.count(searchCriteria)])
     .then((results) => {
       return {
         all: results[0],
