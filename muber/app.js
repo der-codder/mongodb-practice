@@ -4,7 +4,9 @@ const mongoose = require('mongoose');
 
 const routes = require('./routes/routes');
 
-mongoose.connect('mongodb://localhost/muber');
+if (process.env.NODE_ENV !== 'test') {
+  mongoose.connect('mongodb://localhost/muber');
+}
 
 const app = express();
 app.use(bodyParser.json());
